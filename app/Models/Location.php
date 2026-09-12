@@ -1,0 +1,20 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Location extends Model
+{
+    protected $fillable = [
+        'destination_id',
+        'address',
+        'latitude',
+        'longitude',
+    ];
+
+    public function destination()
+    {
+        return $this->belongsTo(Destination::class);
+    }
+}
