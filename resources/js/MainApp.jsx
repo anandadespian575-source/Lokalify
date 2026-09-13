@@ -60,6 +60,11 @@ export default function MainApp() {
   const [destinations, setDestinations] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Status Tamu / Guest Mode
+  const [isGuestMode, setIsGuestMode] = useState(() => {
+    return localStorage.getItem('lokalify_is_guest') === 'true';
+  });
+
   // Tab State
   const [activeTab, setActiveTab] = useState('beranda'); // 'beranda' | 'lokasi'
 
@@ -183,6 +188,9 @@ export default function MainApp() {
   useEffect(() => {
     if (currentUser) {
       localStorage.setItem('lokalify_current_user', JSON.stringify(currentUser));
+      setIsGuestMode(false);
+      localStorage.removeItem('lokalify_is_guest');
+
       const savedChats = localStorage.getItem(`lokalify_chats_${currentUser.username}`);
       if (savedChats) setChatMessages(JSON.parse(savedChats));
 
@@ -209,6 +217,20 @@ export default function MainApp() {
     }
   }, [currentUser]);
 
+  // Handler Masuk Sebagai Guest
+  const handleEnterAsGuest = () => {
+    setIsGuestMode(true);
+    localStorage.setItem('lokalify_is_guest', 'true');
+  };
+
+  // Handler Logout / Keluar
+  const handleLogout = () => {
+    setCurrentUser(null);
+    setIsGuestMode(false);
+    localStorage.removeItem('lokalify_current_user');
+    localStorage.removeItem('lokalify_is_guest');
+  };
+
   // Handler simpan perbaikan profil
   const handleSaveProfile = (e) => {
     e.preventDefault();
@@ -226,20 +248,17 @@ export default function MainApp() {
       }
     };
 
-    // Update currentUser state & localStorage
     setCurrentUser(updatedUser);
-
-    // Update data pengguna di database `registeredUsers`
     const updatedUsersList = registeredUsers.map((u) => 
       u.username === currentUser.username ? updatedUser : u
     );
     setRegisteredUsers(updatedUsersList);
 
-    alert('✅ Profil berhasil diperbarui dan disimpan ke database!');
+    alert('✨ Profil berhasil diperbarui!');
     setShowProfileModal(false);
   };
 
-  // Handler Upload Foto Profil Custom
+  // Handler Upload Foto Profil
   const handleAvatarUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -248,9 +267,7 @@ export default function MainApp() {
         return;
       }
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setEditAvatar(reader.result);
-      };
+      reader.onloadend = () => setEditAvatar(reader.result);
       reader.readAsDataURL(file);
     }
   };
@@ -278,7 +295,7 @@ export default function MainApp() {
     setInputMessage('');
   };
 
-  // Handler Upload File Gambar ke Base64 (Untuk Admin Wisata)
+  // Handler Upload File Gambar ke Base64 (Untuk Admin)
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -287,9 +304,7 @@ export default function MainApp() {
         return;
       }
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setNewImageBase64(reader.result);
-      };
+      reader.onloadend = () => setNewImageBase64(reader.result);
       reader.readAsDataURL(file);
     }
   };
@@ -390,7 +405,7 @@ export default function MainApp() {
       if (selectedDestination?.id === editingId) {
         setSelectedDestination({ ...selectedDestination, ...payload });
       }
-      alert('✅ Wisata berhasil diperbarui!');
+      alert('✨ Wisata berhasil diperbarui!');
     } else {
       const newItem = { id: Date.now(), ...payload, isFavorite: false, reviews: [] };
       const updated = [newItem, ...destinations];
@@ -508,8 +523,8 @@ export default function MainApp() {
     { name: 'Alam', icon: '🌲' },
     { name: 'Danau', icon: '🌊' },
     { name: 'Kebun Teh', icon: '🍃' },
-    { name: 'Kuliner', icon: '🍲' },
-    { name: 'Outbound', icon: '🏕️' }
+    { name: 'Kuliner', icon: '☕' },
+    { name: 'Outbound', icon: '⛺' }
   ];
 
   const filteredDestinations = destinations.filter((item) => {
@@ -518,19 +533,205 @@ export default function MainApp() {
     return matchCategory && matchSearch;
   });
 
+  // ==========================================
+  // 1. HALAMAN LANDING / LOGIN PERTAMA (JIKA BELUM LOGIN & BUKAN GUEST)
+  // ==========================================
+  if (!currentUser && !isGuestMode) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        backgroundColor: '#F8FAFC',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: '20px',
+        fontFamily: "'Inter', sans-serif"
+      }}>
+        <div style={{
+          maxWidth: '900px',
+          width: '100%',
+          backgroundColor: '#FFF',
+          borderRadius: '24px',
+          boxShadow: '0 20px 40px rgba(0,0,0,0.08)',
+          overflow: 'hidden',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))'
+        }}>
+          {/* BANNER KIRI (DESKTOP) */}
+          <div style={{
+            background: 'linear-gradient(135deg, #0066FF 0%, #0044B3 100%)',
+            padding: '40px',
+            color: '#FFF',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between'
+          }}>
+            <div>
+              <h1 style={{ fontSize: '32px', fontWeight: '900', margin: 0 }}>Lokalify ✨</h1>
+              <p style={{ marginTop: '12px', fontSize: '15px', lineHeight: '1.6', opacity: 0.9 }}>
+                Jelajahi keindahan destinasi wisata lokal pilihan, peta interaktif, serta terhubung dengan wisatawan lain.
+              </p>
+            </div>
+            <div style={{ fontSize: '12px', opacity: 0.7 }}>
+              &copy; 2026 Lokalify Wisata Indonesia.
+            </div>
+          </div>
+
+          {/* OPSI AKSES 3 ROLE (KANAN) */}
+          <div style={{ padding: '40px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '20px' }}>
+            <div>
+              <h2 style={{ fontSize: '22px', fontWeight: '800', color: '#1E293B', margin: 0 }}>Selamat Datang! 👋</h2>
+              <p style={{ fontSize: '14px', color: '#64748B', marginTop: '4px' }}>Pilih metode masuk untuk melanjutkan:</p>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              
+              {/* 1. OPSI GUEST */}
+              <button
+                onClick={handleEnterAsGuest}
+                style={{
+                  padding: '14px 20px',
+                  borderRadius: '12px',
+                  border: '2px dashed #CBD5E1',
+                  backgroundColor: '#F8FAFC',
+                  color: '#475569',
+                  fontWeight: '700',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  transition: 'all 0.2s'
+                }}
+              >
+                <span>👻 Masuk sebagai Tamu (Guest)</span>
+                <span style={{ fontSize: '11px', backgroundColor: '#E2E8F0', padding: '4px 8px', borderRadius: '6px' }}>Hanya Lihat</span>
+              </button>
+
+              {/* 2. OPSI USER BIASA */}
+              <button
+                onClick={() => {
+                  setRole('user');
+                  setIsRegister(false);
+                  setShowAuthModal(true);
+                }}
+                style={{
+                  padding: '14px 20px',
+                  borderRadius: '12px',
+                  border: 'none',
+                  backgroundColor: '#0066FF',
+                  color: '#FFF',
+                  fontWeight: '700',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between'
+                }}
+              >
+                <span>👤 Login / Register Pengguna</span>
+                <span style={{ fontSize: '12px' }}>➔</span>
+              </button>
+
+              {/* 3. OPSI ADMIN */}
+              <button
+                onClick={() => {
+                  setRole('admin');
+                  setIsRegister(false);
+                  setShowAuthModal(true);
+                }}
+                style={{
+                  padding: '14px 20px',
+                  borderRadius: '12px',
+                  border: '1px solid #BFDBFE',
+                  backgroundColor: '#EFF6FF',
+                  color: '#0066FF',
+                  fontWeight: '700',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between'
+                }}
+              >
+                <span>🛡️ Masuk / Login Admin</span>
+                <span style={{ fontSize: '11px', backgroundColor: '#DBEAFE', padding: '4px 8px', borderRadius: '6px' }}>Full Akses</span>
+              </button>
+            </div>
+
+            <p style={{ fontSize: '12px', color: '#94A3B8', textAlign: 'center', margin: 0 }}>
+              Mode Tamu hanya bisa melihat destinasi tanpa fitur komentar/chat.
+            </p>
+          </div>
+        </div>
+
+        {/* MODAL AUTH DARI LANDING */}
+        <AuthModal
+          showAuthModal={showAuthModal}
+          setShowAuthModal={setShowAuthModal}
+          handleAuthSubmit={handleAuthSubmit}
+          authError={authError}
+          email={email}
+          setEmail={setEmail}
+          password={password}
+          setPassword={setPassword}
+          isRegister={isRegister}
+          setIsRegister={setIsRegister}
+          role={role}
+          setRole={setRole}
+          adminCode={adminCode}
+          setAdminCode={setAdminCode}
+          handleRegisterSubmit={handleRegisterSubmit}
+          displayName={displayName}
+          setDisplayName={setDisplayName}
+          username={username}
+          setUsername={setUsername}
+        />
+      </div>
+    );
+  }
+
+  // ==========================================
+  // 2. TAMPILAN DASHBOARD / UTAMA APLIKASI
+  // ==========================================
   return (
     <div style={{ fontFamily: "'Inter', sans-serif", backgroundColor: '#F8FAFC', minHeight: '100vh', position: 'relative' }}>
       
+      {/* BANNER NOTIFIKASI TIPE AKSES GUEST */}
+      {isGuestMode && (
+        <div style={{ backgroundColor: '#FEF3C7', borderBottom: '1px solid #FDE68A', padding: '8px 16px', textCenter: 'center', fontSize: '13px', color: '#B45309', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
+          <span>👻 Kamu sedang berada dalam <b>Mode Tamu (Guest)</b>.</span>
+          <button
+            onClick={() => {
+              setIsGuestMode(false);
+              localStorage.removeItem('lokalify_is_guest');
+              setShowAuthModal(true);
+            }}
+            style={{ backgroundColor: '#D97706', color: '#FFF', border: 'none', padding: '4px 10px', borderRadius: '6px', fontSize: '12px', cursor: 'pointer', fontWeight: 'bold' }}
+          >
+            Login Sekarang
+          </button>
+        </div>
+      )}
+
       {/* NAVBAR */}
       <Navbar
         currentUser={currentUser}
         setShowAdminPanel={openNewAdminForm}
-        setShowAuthModal={setShowAuthModal}
-        setShowProfileModal={() => setShowProfileModal(true)}
-        handleLogout={() => setCurrentUser(null)}
+        setShowAuthModal={() => {
+          setIsGuestMode(false);
+          localStorage.removeItem('lokalify_is_guest');
+          setShowAuthModal(true);
+        }}
+        setShowProfileModal={() => {
+          if (!currentUser) alert('Silakan login terlebih dahulu untuk mengakses profil!');
+          else setShowProfileModal(true);
+        }}
+        handleLogout={handleLogout}
         setIsSidebarOpen={() => setIsSidebarOpen(!isSidebarOpen)}
         openChatModal={() => {
-          if (!currentUser) setShowAuthModal(true);
+          if (!currentUser) alert('Fitur Chat hanya tersedia untuk pengguna terdaftar!');
           else setShowChatModal(true);
         }}
       />
@@ -561,7 +762,7 @@ export default function MainApp() {
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #E2E8F0', paddingBottom: '12px' }}>
           <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '800', color: '#0066FF' }}>Lokalify Menu</h3>
-          <button onClick={() => setIsSidebarOpen(false)} style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer' }}>✖</button>
+          <button onClick={() => setIsSidebarOpen(false)} style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer' }}>✕</button>
         </div>
 
         <nav style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '10px' }}>
@@ -582,7 +783,7 @@ export default function MainApp() {
           <button
             onClick={() => {
               setIsSidebarOpen(false);
-              if (!currentUser) setShowAuthModal(true);
+              if (!currentUser) alert('Fitur Chat hanya tersedia untuk pengguna terdaftar!');
               else setShowChatModal(true);
             }}
             style={{ textAlign: 'left', background: '#F8FAFC', border: '1px solid #E2E8F0', padding: '12px', borderRadius: '8px', cursor: 'pointer', fontSize: '14px', fontWeight: '600', color: '#334155', display: 'flex', alignItems: 'center', gap: '10px' }}
@@ -593,7 +794,7 @@ export default function MainApp() {
           <button
             onClick={() => {
               setIsSidebarOpen(false);
-              if (!currentUser) setShowAuthModal(true);
+              if (!currentUser) alert('Silakan login terlebih dahulu untuk melihat profil!');
               else setShowProfileModal(true);
             }}
             style={{ textAlign: 'left', background: '#F8FAFC', border: '1px solid #E2E8F0', padding: '12px', borderRadius: '8px', cursor: 'pointer', fontSize: '14px', fontWeight: '600', color: '#334155', display: 'flex', alignItems: 'center', gap: '10px' }}
@@ -616,9 +817,16 @@ export default function MainApp() {
               onClick={() => { openNewAdminForm(); setIsSidebarOpen(false); }}
               style={{ textAlign: 'left', backgroundColor: '#EFF6FF', color: '#0066FF', border: '1px solid #BFDBFE', padding: '12px', borderRadius: '8px', cursor: 'pointer', fontSize: '14px', fontWeight: '700', marginTop: '10px', display: 'flex', alignItems: 'center', gap: '10px' }}
             >
-              ⚙️ <span>Kelola Wisata (Admin)</span>
+              🛠️ <span>Kelola Wisata (Admin)</span>
             </button>
           )}
+
+          <button
+            onClick={handleLogout}
+            style={{ textAlign: 'left', backgroundColor: '#FEE2E2', color: '#EF4444', border: '1px solid #FCA5A5', padding: '12px', borderRadius: '8px', cursor: 'pointer', fontSize: '14px', fontWeight: '700', marginTop: 'auto', display: 'flex', alignItems: 'center', gap: '10px' }}
+          >
+            🚪 <span>Keluar / Ganti Akses</span>
+          </button>
         </nav>
       </aside>
 
@@ -633,7 +841,7 @@ export default function MainApp() {
                   onClick={() => setSelectedCategory('Semua')}
                   style={{ padding: '10px', borderRadius: '12px', cursor: 'pointer', textAlign: 'center', backgroundColor: selectedCategory === 'Semua' ? '#0066FF' : '#FFF', color: selectedCategory === 'Semua' ? '#FFF' : '#333', border: '1px solid #E2E8F0' }}
                 >
-                  🏞️ <br /> <span style={{ fontSize: '12px' }}>Semua</span>
+                  🌐 <br /> <span style={{ fontSize: '12px' }}>Semua</span>
                 </div>
                 {categories.map((cat) => (
                   <div
@@ -669,6 +877,10 @@ export default function MainApp() {
               selectedDestination={selectedDestination}
               currentUser={currentUser}
               onAddReview={(id, rev) => {
+                if (!currentUser) {
+                  alert('Mode Tamu (Guest) tidak dapat memberikan komentar. Silakan login!');
+                  return;
+                }
                 const updated = destinations.map((d) => d.id === id ? { ...d, reviews: [rev, ...(d.reviews || [])] } : d);
                 setDestinations(updated);
                 localStorage.setItem('lokalify_destinations', JSON.stringify(updated));
@@ -694,7 +906,7 @@ export default function MainApp() {
                 onClick={handleGetLocation}
                 style={{ padding: '10px 18px', backgroundColor: '#0066FF', color: '#FFF', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}
               >
-                📡 Ambil Lokasi Saya
+                🛰️ Ambil Lokasi Saya
               </button>
             </div>
 
@@ -741,7 +953,7 @@ export default function MainApp() {
             {/* DAFTAR TEMAN */}
             <div style={{ width: '260px', backgroundColor: '#F8FAFC', borderRight: '1px solid #E2E8F0', display: 'flex', flexDirection: 'column' }}>
               <div style={{ padding: '16px', borderBottom: '1px solid #E2E8F0', fontWeight: '800', color: '#1E293B', fontSize: '15px' }}>
-                💬 Teman Chat
+                👥 Teman Chat
               </div>
               <div style={{ flex: 1, overflowY: 'auto' }}>
                 {friendsList.map((friend) => (
@@ -776,7 +988,7 @@ export default function MainApp() {
                 <span style={{ fontWeight: 'bold', fontSize: '14px' }}>
                   {activeChatFriend ? `💬 Chat dengan ${activeChatFriend.displayName}` : 'Pilih teman untuk chat'}
                 </span>
-                <button onClick={() => setShowChatModal(false)} style={{ background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer' }}>✖</button>
+                <button onClick={() => setShowChatModal(false)} style={{ background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer' }}>✕</button>
               </div>
 
               <div style={{ flex: 1, padding: '16px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px', backgroundColor: '#F1F5F9' }}>
@@ -816,13 +1028,13 @@ export default function MainApp() {
         </div>
       )}
 
-      {/* MODAL PROFIL AKUN (KUSTOMISASI & PERMANEN USERNAME) */}
+      {/* MODAL PROFIL AKUN */}
       {showProfileModal && currentUser && (
         <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 2000, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <div style={{ backgroundColor: '#FFF', padding: '24px', borderRadius: '16px', width: '90%', maxWidth: '480px', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.2)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #E2E8F0', paddingBottom: '12px', marginBottom: '16px' }}>
               <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '800' }}>👤 Pengaturan Profil Akun</h3>
-              <button onClick={() => setShowProfileModal(false)} style={{ background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer' }}>✖</button>
+              <button onClick={() => setShowProfileModal(false)} style={{ background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer' }}>✕</button>
             </div>
 
             <form onSubmit={handleSaveProfile} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
@@ -843,10 +1055,10 @@ export default function MainApp() {
                 </label>
               </div>
 
-              {/* USERNAME (LOCKED / PERMANEN) */}
+              {/* USERNAME */}
               <div>
                 <label style={{ fontSize: '12px', fontWeight: 'bold', color: '#64748B', display: 'block', marginBottom: '4px' }}>
-                  Username (Permanen - Tidak Dapat Diubah):
+                  Username (Permanen):
                 </label>
                 <input
                   type="text"
@@ -888,7 +1100,7 @@ export default function MainApp() {
               {/* LINK SOSIAL MEDIA */}
               <div>
                 <label style={{ fontSize: '12px', fontWeight: 'bold', color: '#334155', display: 'block', marginBottom: '6px' }}>
-                  🔗 Link Sosial Media:
+                  🌐 Link Sosial Media:
                 </label>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <input
@@ -925,10 +1137,7 @@ export default function MainApp() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
-                    setCurrentUser(null);
-                    setShowProfileModal(false);
-                  }}
+                  onClick={handleLogout}
                   style={{ flex: 1, padding: '10px', backgroundColor: '#EF4444', color: '#FFF', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px' }}
                 >
                   Keluar (Logout)
@@ -949,7 +1158,7 @@ export default function MainApp() {
                 <span style={{ fontSize: '20px' }}>🤖</span>
                 <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '800' }}>BugBot Assistant</h3>
               </div>
-              <button onClick={() => setShowBugBotModal(false)} style={{ background: 'none', border: 'none', color: '#FFF', fontSize: '18px', cursor: 'pointer' }}>✖</button>
+              <button onClick={() => setShowBugBotModal(false)} style={{ background: 'none', border: 'none', color: '#FFF', fontSize: '18px', cursor: 'pointer' }}>✕</button>
             </div>
 
             <div style={{ flex: 1, padding: '16px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '12px', backgroundColor: '#F8FAFC' }}>
@@ -978,7 +1187,7 @@ export default function MainApp() {
                       onClick={() => handleSelectBugCategory(cat)}
                       style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #CBD5E1', backgroundColor: '#FFF', textAlign: 'left', cursor: 'pointer', fontSize: '12px', fontWeight: '600' }}
                     >
-                      📌 {cat}
+                      🐛 {cat}
                     </button>
                   ))}
                 </div>
@@ -1046,7 +1255,7 @@ export default function MainApp() {
 
               <div style={{ position: 'relative' }}>
                 <label style={{ fontSize: '12px', fontWeight: 'bold', color: '#334155', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '4px' }}>
-                  🔍 Cari & Set Lokasi Alamat:
+                  📍 Cari & Set Lokasi Alamat:
                 </label>
                 <input
                   type="text"
