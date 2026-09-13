@@ -1,108 +1,67 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-export default function AuthModal({
-  showAuthModal,
-  setShowAuthModal,
-  handleAuthSubmit,
-  authError,
-  email,
-  setEmail,
-  password,
-  setPassword,
-  isRegister,
-  setIsRegister,
-  role,
-  setRole,
-  adminCode,
-  setAdminCode,
-  handleRegisterSubmit,
-  displayName,
-  setDisplayName,
-  username,
-  setUsername
-}) {
-  if (!showAuthModal) return null;
+export default function AuthModal({ onClose, setCurrentUser }) {
+  const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!email || !password) return;
+
+    // Simulasi Login Admin & User
+    const role = email.includes('admin') ? 'admin' : 'user';
+    const userObj = {
+      displayName: name || email.split('@')[0],
+      email: email,
+      role: role
+    };
+
+    setCurrentUser(userObj);
+    alert(`Berhasil ${isLogin ? 'Masuk' : 'Mendaftar'} sebagai ${role.toUpperCase()}!`);
+    onClose();
+  };
 
   return (
-    <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 2000, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-      <div style={{ backgroundColor: '#FFF', padding: '24px', borderRadius: '12px', width: '90%', maxWidth: '400px' }}>
-        <h3 style={{ marginTop: 0 }}>{isRegister ? 'Daftar Akun Baru' : 'Masuk ke Lokalify'}</h3>
-        
-        {authError && <p style={{ color: '#EF4444', fontSize: '12px', backgroundColor: '#FEE2E2', padding: '8px', borderRadius: '6px' }}>{authError}</p>}
+    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ backgroundColor: '#FFFFFF', borderRadius: '20px', padding: '32px', width: '100%', maxWidth: '380px', boxShadow: '0 10px 25px rgba(0,0,0,0.2)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+          <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '800', color: '#1E293B' }}>
+            {isLogin ? '🔑 Masuk ke Lokalify' : '📝 Daftar Akun Baru'}
+          </h2>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer', color: '#64748B' }}>✕</button>
+        </div>
 
-        <form onSubmit={isRegister ? handleRegisterSubmit : handleAuthSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          {isRegister && (
-            <>
-              <input
-                type="text"
-                placeholder="Nama Tampilan (Display Name)"
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-                required
-                style={{ padding: '8px', borderRadius: '6px', border: '1px solid #CBD5E1' }}
-              />
-              <input
-                type="text"
-                placeholder="Username Unik (@username)"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-                style={{ padding: '8px', borderRadius: '6px', border: '1px solid #CBD5E1' }}
-              />
-            </>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          {!isLogin && (
+            <div>
+              <label style={{ fontSize: '12px', fontWeight: '700', color: '#475569' }}>Nama Lengkap</label>
+              <input type="text" value={name} onChange={(e) => setName(e.target.value)} required placeholder="Nama kamu" style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #CBD5E1', marginTop: '4px', boxSizing: 'border-box' }} />
+            </div>
           )}
 
-          <input
-            type="text"
-            placeholder={isRegister ? "Email" : "Username atau Email"}
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            style={{ padding: '8px', borderRadius: '6px', border: '1px solid #CBD5E1' }}
-          />
+          <div>
+            <label style={{ fontSize: '12px', fontWeight: '700', color: '#475569' }}>Alamat Email</label>
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="nama@email.com" style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #CBD5E1', marginTop: '4px', boxSizing: 'border-box' }} />
+          </div>
 
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            style={{ padding: '8px', borderRadius: '6px', border: '1px solid #CBD5E1' }}
-          />
+          <div>
+            <label style={{ fontSize: '12px', fontWeight: '700', color: '#475569' }}>Kata Sandi</label>
+            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required placeholder="••••••••" style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #CBD5E1', marginTop: '4px', boxSizing: 'border-box' }} />
+          </div>
 
-          {isRegister && (
-            <>
-              <select value={role} onChange={(e) => setRole(e.target.value)} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #CBD5E1' }}>
-                <option value="user">User Biasa</option>
-                <option value="admin">Admin</option>
-              </select>
-
-              {role === 'admin' && (
-                <input
-                  type="password"
-                  placeholder="Kode Lisensi Admin Rahasia"
-                  value={adminCode}
-                  onChange={(e) => setAdminCode(e.target.value)}
-                  required
-                  style={{ padding: '8px', borderRadius: '6px', border: '1px solid #CBD5E1' }}
-                />
-              )}
-            </>
-          )}
-
-          <button type="submit" style={{ backgroundColor: '#0066FF', color: '#FFF', border: 'none', padding: '10px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>
-            {isRegister ? 'Daftar Sekarang' : 'Masuk'}
+          <button type="submit" style={{ padding: '12px', backgroundColor: '#0066FF', color: '#FFF', border: 'none', borderRadius: '10px', fontWeight: 'bold', cursor: 'pointer', marginTop: '8px' }}>
+            {isLogin ? 'Masuk Sekarang' : 'Daftar Akun'}
           </button>
         </form>
 
-        <p style={{ fontSize: '12px', textAlign: 'center', marginTop: '14px' }}>
-          {isRegister ? 'Sudah punya akun?' : 'Belum punya akun?'}{' '}
-          <span onClick={() => setIsRegister(!isRegister)} style={{ color: '#0066FF', cursor: 'pointer', fontWeight: 'bold' }}>
-            {isRegister ? 'Masuk di sini' : 'Daftar di sini'}
+        <p style={{ textAlign: 'center', fontSize: '13px', color: '#64748B', marginTop: '16px' }}>
+          {isLogin ? 'Belum punya akun?' : 'Sudah punya akun?'}{' '}
+          <span onClick={() => setIsLogin(!isLogin)} style={{ color: '#0066FF', fontWeight: 'bold', cursor: 'pointer' }}>
+            {isLogin ? 'Daftar' : 'Masuk'}
           </span>
         </p>
-
-        <button onClick={() => setShowAuthModal(false)} style={{ width: '100%', backgroundColor: '#E2E8F0', border: 'none', padding: '6px', borderRadius: '6px', fontSize: '12px', cursor: 'pointer' }}>Tutup</button>
       </div>
     </div>
   );

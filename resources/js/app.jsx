@@ -1,10 +1,15 @@
+import './bootstrap';
 import React from 'react';
-import ReactDOM from 'react-dom/client';
+import { createRoot } from 'react-dom/client';
 import MainApp from './MainApp';
 
-const rootElement = document.getElementById('root');
+const container = document.getElementById('app');
 
-if (rootElement) {
-  const root = ReactDOM.createRoot(rootElement);
-  root.render(<MainApp />);
+if (container) {
+  const root = createRoot(container);
+  root.render(
+    <React.StrictMode>
+      <MainApp />
+    </React.StrictMode>
+  );
 }
