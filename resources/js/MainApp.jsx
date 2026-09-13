@@ -87,11 +87,8 @@ export default function MainApp() {
   const [password, setPassword] = useState('');
   const [authError, setAuthError] = useState('');
 
-  const [currentUser, setCurrentUser] = useState(() => {
-    const savedUser = localStorage.getItem('lokalify_current_user');
-    return savedUser ? JSON.parse(savedUser) : null;
-  });
-
+  const [currentUser, setCurrentUser] = useState(null);
+    
   const [registeredUsers, setRegisteredUsers] = useState(() => {
     const saved = localStorage.getItem('lokalify_users_db');
     if (saved) {
