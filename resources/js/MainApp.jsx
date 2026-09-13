@@ -61,9 +61,7 @@ export default function MainApp() {
   const [loading, setLoading] = useState(true);
 
   // Status Tamu / Guest Mode
-  const [isGuestMode, setIsGuestMode] = useState(() => {
-    return localStorage.getItem('lokalify_is_guest') === 'true';
-  });
+  const [isGuestMode, setIsGuestMode] = useState(false);
 
   // Tab State
   const [activeTab, setActiveTab] = useState('beranda'); // 'beranda' | 'lokasi'
