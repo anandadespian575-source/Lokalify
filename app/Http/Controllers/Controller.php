@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Wisata;
+use App\Events\WisataCreated;
 
 class WisataController extends Controller
 {
@@ -28,7 +29,7 @@ class WisataController extends Controller
         }
 
         // 3. Simpan Rekaman Data Wisata ke Database
-        Wisata::create([
+        $wisata = Wisata::create([
             'nama_wisata' => $request->nama_wisata,
             'kategori'    => $request->kategori,
             'lokasi'      => $request->lokasi,
@@ -37,6 +38,9 @@ class WisataController extends Controller
             'foto'        => $fotoPath, // Hasil berupa string: "galery/nama_file.jpg"
             'deskripsi'   => $request->deskripsi,
         ]);
+
+        // 4. Trigger Event Real-time Pusher ke Perangkat Lain
+        broadcast(new WisataCreated($wisata))->toOthers();
 
         return redirect()->back()->with('success', 'Wisata berhasil ditambahkan!');
     }
