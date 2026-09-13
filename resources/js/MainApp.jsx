@@ -6,7 +6,11 @@ import Navbar from './components/Navbar';
 import DestinationCard from './components/DestinationCard';
 import DetailWidget from './components/DetailWidget';
 import AuthModal from './components/AuthModal';
+<<<<<<< HEAD
 import NotificationsPage from './pages/NotificationsPage';
+=======
+import ChatWidget from './components/ChatWidget';
+>>>>>>> 9dc6becf688e39c4a4799b4b28776082768adca5
 
 // Mock Data Awal Wisata
 const DEFAULT_DESTINATIONS = [
@@ -107,7 +111,6 @@ export default function MainApp() {
   const [editTiktok, setEditTiktok] = useState('');
   const [editWebsite, setEditWebsite] = useState('');
 
-  // Synchronize Profil Form saat Modal Profil Dibuka atau currentUser berubah
   useEffect(() => {
     if (currentUser) {
       setEditDisplayName(currentUser.displayName || '');
@@ -250,7 +253,7 @@ export default function MainApp() {
     );
     setRegisteredUsers(updatedUsersList);
 
-    alert('✨ Profil berhasil diperbarui!');
+    alert('🎉 Profil berhasil diperbarui!');
     setShowProfileModal(false);
   };
 
@@ -401,7 +404,7 @@ export default function MainApp() {
       if (selectedDestination?.id === editingId) {
         setSelectedDestination({ ...selectedDestination, ...payload });
       }
-      alert('✨ Wisata berhasil diperbarui!');
+      alert('🎉 Wisata berhasil diperbarui!');
     } else {
       const newItem = { id: Date.now(), ...payload, isFavorite: false, reviews: [] };
       const updated = [newItem, ...destinations];
@@ -519,7 +522,7 @@ export default function MainApp() {
     { name: 'Alam', icon: '🌲' },
     { name: 'Danau', icon: '🌊' },
     { name: 'Kebun Teh', icon: '🍃' },
-    { name: 'Kuliner', icon: '☕' },
+    { name: 'Kuliner', icon: '🍲' },
     { name: 'Outbound', icon: '⛺' }
   ];
 
@@ -564,7 +567,7 @@ export default function MainApp() {
             justifyContent: 'space-between'
           }}>
             <div>
-              <h1 style={{ fontSize: '32px', fontWeight: '900', margin: 0 }}>Lokalify ✨</h1>
+              <h1 style={{ fontSize: '32px', fontWeight: '900', margin: 0 }}>Lokalify 🌿</h1>
               <p style={{ marginTop: '12px', fontSize: '15px', lineHeight: '1.6', opacity: 0.9 }}>
                 Jelajahi keindahan destinasi wisata lokal pilihan, peta interaktif, serta terhubung dengan wisatawan lain.
               </p>
@@ -601,7 +604,7 @@ export default function MainApp() {
                   transition: 'all 0.2s'
                 }}
               >
-                <span>👻 Masuk sebagai Tamu (Guest)</span>
+                <span>👤 Masuk sebagai Tamu (Guest)</span>
                 <span style={{ fontSize: '11px', backgroundColor: '#E2E8F0', padding: '4px 8px', borderRadius: '6px' }}>Hanya Lihat</span>
               </button>
 
@@ -651,7 +654,7 @@ export default function MainApp() {
                   justifyContent: 'space-between'
                 }}
               >
-                <span>🛡️ Masuk / Login Admin</span>
+                <span>🔑 Masuk / Login Admin</span>
                 <span style={{ fontSize: '11px', backgroundColor: '#DBEAFE', padding: '4px 8px', borderRadius: '6px' }}>Full Akses</span>
               </button>
             </div>
@@ -697,7 +700,7 @@ export default function MainApp() {
       {/* BANNER NOTIFIKASI TIPE AKSES GUEST */}
       {isGuestMode && (
         <div style={{ backgroundColor: '#FEF3C7', borderBottom: '1px solid #FDE68A', padding: '8px 16px', textCenter: 'center', fontSize: '13px', color: '#B45309', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
-          <span>👻 Kamu sedang berada dalam <b>Mode Tamu (Guest)</b>.</span>
+          <span>⚠️ Kamu sedang berada dalam <b>Mode Tamu (Guest)</b>.</span>
           <button
             onClick={() => {
               setIsGuestMode(false);
@@ -813,7 +816,7 @@ export default function MainApp() {
               onClick={() => { openNewAdminForm(); setIsSidebarOpen(false); }}
               style={{ textAlign: 'left', backgroundColor: '#EFF6FF', color: '#0066FF', border: '1px solid #BFDBFE', padding: '12px', borderRadius: '8px', cursor: 'pointer', fontSize: '14px', fontWeight: '700', marginTop: '10px', display: 'flex', alignItems: 'center', gap: '10px' }}
             >
-              🛠️ <span>Kelola Wisata (Admin)</span>
+              🔑 <span>Kelola Wisata (Admin)</span>
             </button>
           )}
 
@@ -902,7 +905,7 @@ export default function MainApp() {
                 onClick={handleGetLocation}
                 style={{ padding: '10px 18px', backgroundColor: '#0066FF', color: '#FFF', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}
               >
-                🛰️ Ambil Lokasi Saya
+                🎯 Ambil Lokasi Saya
               </button>
             </div>
 
@@ -941,84 +944,30 @@ export default function MainApp() {
         </main>
       )}
 
-      {/* MODAL FITUR CHAT & TEMAN */}
+      {/* MODAL FITUR CHAT & TEMAN (MENGGUNAKAN KOMPONEN MODULAR CHATWIDGET) */}
       {showChatModal && currentUser && (
         <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 2000, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <div style={{ backgroundColor: '#FFF', borderRadius: '16px', width: '90%', maxWidth: '750px', height: '520px', display: 'flex', overflow: 'hidden', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.2)' }}>
+          <div style={{ backgroundColor: '#FFF', borderRadius: '16px', width: '90%', maxWidth: '820px', height: '540px', display: 'flex', flexDirection: 'column', overflow: 'hidden', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.2)' }}>
             
-            {/* DAFTAR TEMAN */}
-            <div style={{ width: '260px', backgroundColor: '#F8FAFC', borderRight: '1px solid #E2E8F0', display: 'flex', flexDirection: 'column' }}>
-              <div style={{ padding: '16px', borderBottom: '1px solid #E2E8F0', fontWeight: '800', color: '#1E293B', fontSize: '15px' }}>
-                👥 Teman Chat
-              </div>
-              <div style={{ flex: 1, overflowY: 'auto' }}>
-                {friendsList.map((friend) => (
-                  <div
-                    key={friend.username}
-                    onClick={() => setActiveChatFriend(friend)}
-                    style={{
-                      padding: '12px 16px',
-                      cursor: 'pointer',
-                      backgroundColor: activeChatFriend?.username === friend.username ? '#EFF6FF' : 'transparent',
-                      borderLeft: activeChatFriend?.username === friend.username ? '4px solid #0066FF' : '4px solid transparent',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '10px'
-                    }}
-                  >
-                    <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: '#0066FF', color: '#FFF', display: 'flex', justifyContent: 'center', alignItems: 'center', fontWeight: 'bold' }}>
-                      {friend.displayName ? friend.displayName.charAt(0) : 'U'}
-                    </div>
-                    <div>
-                      <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#1E293B' }}>{friend.displayName}</div>
-                      <div style={{ fontSize: '11px', color: '#64748B' }}>@{friend.username}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+            {/* Header Modal Chat */}
+            <div style={{ padding: '12px 16px', borderBottom: '1px solid #E2E8F0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#FFF' }}>
+              <span style={{ fontWeight: '800', fontSize: '15px', color: '#1E293B' }}>💬 Chat Lokalify</span>
+              <button onClick={() => setShowChatModal(false)} style={{ background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer', color: '#64748B' }}>✕</button>
             </div>
 
-            {/* AREA ISI CHAT */}
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#FFF' }}>
-              <div style={{ padding: '14px 16px', borderBottom: '1px solid #E2E8F0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontWeight: 'bold', fontSize: '14px' }}>
-                  {activeChatFriend ? `💬 Chat dengan ${activeChatFriend.displayName}` : 'Pilih teman untuk chat'}
-                </span>
-                <button onClick={() => setShowChatModal(false)} style={{ background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer' }}>✕</button>
-              </div>
-
-              <div style={{ flex: 1, padding: '16px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px', backgroundColor: '#F1F5F9' }}>
-                {activeChatFriend && chatMessages[activeChatFriend.username]?.map((msg) => (
-                  <div key={msg.id} style={{ alignSelf: msg.sender === currentUser.username ? 'flex-end' : 'flex-start', maxWidth: '70%' }}>
-                    <div style={{
-                      padding: '8px 12px',
-                      borderRadius: '10px',
-                      fontSize: '13px',
-                      backgroundColor: msg.sender === currentUser.username ? '#0066FF' : '#FFF',
-                      color: msg.sender === currentUser.username ? '#FFF' : '#333',
-                      boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
-                    }}>
-                      {msg.text}
-                    </div>
-                    <span style={{ fontSize: '10px', color: '#94A3B8', display: 'block', textAlign: msg.sender === currentUser.username ? 'right' : 'left', marginTop: '2px' }}>{msg.time}</span>
-                  </div>
-                ))}
-              </div>
-
-              {activeChatFriend && (
-                <form onSubmit={handleSendMessage} style={{ padding: '12px', borderTop: '1px solid #E2E8F0', display: 'flex', gap: '8px' }}>
-                  <input
-                    type="text"
-                    placeholder="Ketik pesan..."
-                    value={inputMessage}
-                    onChange={(e) => setInputMessage(e.target.value)}
-                    style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '13px' }}
-                  />
-                  <button type="submit" style={{ padding: '10px 16px', backgroundColor: '#0066FF', color: '#FFF', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
-                    Kirim
-                  </button>
-                </form>
-              )}
+            {/* Panggilan Komponen ChatWidget */}
+            <div style={{ flex: 1, overflow: 'hidden' }}>
+              <ChatWidget
+                currentUser={currentUser}
+                friendsList={friendsList}
+                setFriendsList={setFriendsList}
+                activeChatFriend={activeChatFriend}
+                setActiveChatFriend={setActiveChatFriend}
+                chatMessages={chatMessages}
+                inputMessage={inputMessage}
+                setInputMessage={setInputMessage}
+                handleSendMessage={handleSendMessage}
+              />
             </div>
           </div>
         </div>
