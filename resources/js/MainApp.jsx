@@ -6,6 +6,7 @@ import Navbar from './components/Navbar';
 import DestinationCard from './components/DestinationCard';
 import DetailWidget from './components/DetailWidget';
 import AuthModal from './components/AuthModal';
+import NotificationsPage from './pages/NotificationsPage';
 
 // Mock Data Awal Wisata
 const DEFAULT_DESTINATIONS = [
