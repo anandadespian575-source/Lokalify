@@ -5,17 +5,21 @@
         "build": "vite build",
         "dev": "vite"
     },
-    "devDependencies": {
+    "dependencies": {
         "@tailwindcss/vite": "^4.0.0",
         "@vitejs/plugin-react": "^4.7.0",
         "axios": "^1.11.0",
         "concurrently": "^9.0.1",
         "laravel-vite-plugin": "^2.0.0",
         "tailwindcss": "^4.0.0",
+<<<<<<< HEAD
         "vite": "^7.0.7"
     },
     "dependencies": {
         "laravel-echo": "^2.5.0",
+=======
+        "vite": "^7.0.7",
+>>>>>>> 414af619cc743c25a5389cd15d2d93f8d2fcb82c
         "leaflet": "^1.9.4",
         "lucide-react": "^1.44.0",
         "pusher-js": "^8.6.0",
